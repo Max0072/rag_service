@@ -15,7 +15,7 @@ def process_single_dict(row):
     attendants = row["attendants"]
     date = row["date"]
     summary = row["summary"]
-    text = row["text"]
+    text = row["transcript"]
 
     chunker = SemanticChunker()  # Создаём экземпляр класса
     chunks = chunker.chunk(text)
@@ -25,7 +25,7 @@ def process_single_dict(row):
         # chunks[i] = f"Transcription:\n{chunks[i]}\n\nSummary:\n{summary}\n\nAttendants:\n{attendants}"
         new_chunk = {"text": chunks[i]}
         keys = list(row.keys())
-        keys.remove("text")
+        keys.remove("transcript")
         for key in keys:
             new_chunk[key] = row[key]
         new_chunks.append(new_chunk)
@@ -35,7 +35,7 @@ def process_single_dict(row):
 
 
 def main():
-    chunks = process_data([{"text": "Today we discussed the new marketing strategy for Q1. The team agreed to focus on short-form video content and improve customer acquisition funnels.", "summary": "Meeting about Q1 marketing strategy and next steps.", "date": "2025-01-17", "attendants": ["Alice Johnson", "Mark Rivera", "Diana Petrova", "Samuel Kim"], "links": ["https://docs.example.com/marketing-plan", "https://drive.example.com/file/strategy-overview"]}])
+    chunks = process_data([{"transcript": "Today we discussed the new marketing strategy for Q1. The team agreed to focus on short-form video content and improve customer acquisition funnels.", "summary": "Meeting about Q1 marketing strategy and next steps.", "date": "2025-01-17", "attendants": ["Alice Johnson", "Mark Rivera", "Diana Petrova", "Samuel Kim"], "links": ["https://docs.example.com/marketing-plan", "https://drive.example.com/file/strategy-overview"]}])
     print(chunks)
 
 
