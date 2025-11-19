@@ -34,7 +34,9 @@ async def upload_json(request: Request, file: Optional[UploadFile] = File(None))
     print(type(rows_parsed))
     print(rows_parsed)
 
+    # Process_data
     processed_chunks = process_data(rows_parsed)
+    # Upload corpus to the search engine
     search_engine.upload_corpus(processed_chunks)
     return {"loaded": len(rows_parsed)}
 
@@ -50,8 +52,14 @@ def search(query: dict):
     if search_engine.index_is_empty():
         return {"detail": "Index is empty. Upload data first."}
     text = query.get("query")
-    ids_score_list = search_engine.similarity_search_single(text)
-    ids = ids_score_list["ids"]
+
+    id_score_list = search_engine.similarity_search_single(text, k=10)
+
+    ids = [_id for _id in id_score_list["ids"] if _id != -1]
+    scores = [id_score_list["scores"][i] for i in range(len(ids))]
+    print(ids)
+    print(scores)
+
     chunks = search_engine.get_chunks_by_ids(ids)
     return {"chunks": chunks}
 

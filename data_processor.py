@@ -1,20 +1,13 @@
 from chunkers import SemanticChunker, RecursiveCharacterTextChunker
 
 
-def process_data(data):
-    chunks = []
-    for row in data:
-        chunks.extend(process_single_dict(row))
-    return chunks
 
+def process_empty(data):
+    return data
 
 
 
 def process_single_dict(row):
-    links = row["links"]
-    attendants = row["attendants"]
-    date = row["date"]
-    summary = row["summary"]
     text = row["transcript"]
 
     chunker = SemanticChunker()  # Создаём экземпляр класса
@@ -22,7 +15,6 @@ def process_single_dict(row):
 
     new_chunks = []
     for i in range(len(chunks)):
-        # chunks[i] = f"Transcription:\n{chunks[i]}\n\nSummary:\n{summary}\n\nAttendants:\n{attendants}"
         new_chunk = {"text": chunks[i]}
         keys = list(row.keys())
         keys.remove("transcript")
@@ -30,8 +22,14 @@ def process_single_dict(row):
             new_chunk[key] = row[key]
         new_chunks.append(new_chunk)
 
-
     return new_chunks
+
+
+def process_data(data):
+    chunks = []
+    for row in data:
+        chunks.extend(process_single_dict(row))
+    return chunks
 
 
 def main():

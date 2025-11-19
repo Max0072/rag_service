@@ -27,3 +27,8 @@ def get_device():
         return torch.device("mps")
     else:
         return torch.device("cpu")
+
+
+def model_emb_dim(model):
+    vec = model.encode("test")
+    return len(vec)
