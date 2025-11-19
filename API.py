@@ -1,32 +1,20 @@
-import json
 from typing import List, Any, Optional, Dict
 from fastapi import FastAPI, UploadFile, File, Request, Body
-from sentence_transformers import SentenceTransformer
-from search_engine import build_rag
+
+from utils import parse_json_or_jsonl, get_device
 from data_processor import process_data
-# This api allows uploading JSON/JSONL data and perform similarity search.
-# Read the README_API.md for details.
+from search_engine import SearchEngine
+
+from sentence_transformers import SentenceTransformer
+import faiss
 
 app = FastAPI(title="VectorSearchAPI")
 
-search_engine = build_rag()
 
+embed_model = SentenceTransformer("all-MiniLM-L6-v2", device=str(get_device()))
+index = faiss.IndexIDMap(faiss.IndexFlatIP(384))
 
-# function to parse JSON or JSONL from bytes
-def parse_json_or_jsonl(raw: bytes, encoding: str = 'utf-8') -> List[Any]:
-    text = raw.decode(encoding).strip()
-    if text.startswith('['):
-        data = json.loads(text)
-        if isinstance(data, list):
-            return data
-        else:
-            raise ValueError("JSON content is not a list")
-    items = []
-    for i, line in enumerate(text.splitlines(), start=1):
-        line = line.strip()
-        if line:
-            items.append(json.loads(line))
-    return items
+search_engine = SearchEngine(embed_model, index)
 
 
 
@@ -65,7 +53,7 @@ def search(query: dict):
     ids_score_list = search_engine.similarity_search_single(text)
     ids = ids_score_list["ids"]
     chunks = search_engine.get_chunks_by_ids(ids)
-    return chunks
+    return {"chunks": chunks}
 
 
 # @app.post("/search_batch")
@@ -80,6 +68,9 @@ def search(query: dict):
 #
 #     results = search_engine.find_similar_from_text_batch(rows)
 #     return {"results": results}
+
+
+
 
 
 if __name__ == "__main__":

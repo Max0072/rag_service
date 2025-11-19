@@ -29,5 +29,6 @@ Follow these rules:
 {context}"""
 
     def get_prompt(self, query: str, relevant_chunks: List):
-        prompt = [f"{self.base_prompt}\n\n# Query:\n{query}\n\n# Context:\n{'\n'.join(relevant_chunks)}"]
+        context_chunks = '\n'.join(relevant_chunks)
+        prompt = [f"{self.base_prompt}\n\n# Query:\n{query}\n\n# Context:\n{context_chunks}"]
         return prompt
