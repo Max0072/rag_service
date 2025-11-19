@@ -51,7 +51,7 @@ class SearchEngine:
             internal_id = len(self.id_to_chunk)
             self.id_to_chunk[internal_id] = sample
 
-            emb = self._embed_normalized(sample["text"]+sample["meta-data"]) # get embedding of the text part
+            emb = self._embed_normalized(sample["text"] + sample["summary"]) # get embedding of the text part
             embeddings.append(emb)
             ids.append(internal_id)                                 # add current id to id list
 
