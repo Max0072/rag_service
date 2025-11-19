@@ -28,6 +28,9 @@ def main():
     ]
     query = "Is it a typical thing?"
 
+    # preprocessing
+    corpus = process_empty(corpus)
+
     # search engine init
     embed_model = SentenceTransformer("all-MiniLM-L6-v2", device=str(get_device()))
     dim = model_emb_dim(embed_model)
@@ -50,6 +53,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    pass
 
 

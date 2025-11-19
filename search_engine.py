@@ -93,8 +93,12 @@ class SearchEngine:
 
     # return a list of chunks
     def get_chunks_by_ids(self, ids):
-        chunks = [self.id_to_chunk[_id] for _id in ids]
-        return chunks
+        if isinstance(ids, int):         # Single integer
+            return self.id_to_chunk[ids]
+        if isinstance(ids, list):        # List of integers
+            return [self.get_chunks_by_ids(x) for x in ids]
+        else:
+            return "Not a valid id"
 
 # -------------------- finish ----------------------------------------- done 100%
 
@@ -103,8 +107,8 @@ def main():
 
     # corpus and queries
     corpus = [
-        {"text": "Hello, world!", "meta-data": "Lol, very typical sentence"},
-        {"text": "Hello, world!", "meta-data": "Basic sentence in python"},
+        {"text": "Hello, world!", "summary": "Lol, very typical sentence"},
+        {"text": "Hello, world!", "summary": "Basic sentence in python"},
     ]
     query = "Is it a typical thing?"
 
@@ -127,7 +131,6 @@ def main():
     # get chunks
     chunks = search_engine.get_chunks_by_ids(ids)
     print(chunks)
-
 
 
 if __name__ == "__main__":

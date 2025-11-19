@@ -2,7 +2,7 @@ from typing import List, Any, Optional, Dict
 from fastapi import FastAPI, UploadFile, File, Request, Body
 
 from utils import parse_json_or_jsonl, get_device
-from data_processor import process_data
+from data_processor import process_data, preprocess_query123
 from search_engine import SearchEngine
 
 from sentence_transformers import SentenceTransformer
@@ -51,9 +51,11 @@ def delete_all():
 def search(query: dict):
     if search_engine.index_is_empty():
         return {"detail": "Index is empty. Upload data first."}
-    text = query.get("query")
+    text = query["query"]
 
+    # similarity search by the single query
     id_score_list = search_engine.similarity_search_single(text, k=10)
+    # returns {"ids": ids, "scores": scores}
 
     ids = [_id for _id in id_score_list["ids"] if _id != -1]
     scores = [id_score_list["scores"][i] for i in range(len(ids))]
@@ -64,18 +66,37 @@ def search(query: dict):
     return {"chunks": chunks}
 
 
-# @app.post("/search_batch")
-# async def search_batch(request: Request, file: UploadFile | None = File(None)):
-#     if search_engine.index_is_empty():
-#         return {"detail": "Index is empty. Upload data first."}
-#     if file:
-#         raw = await file.read()
-#         rows = parse_json_or_jsonl(raw)
-#     else:
-#         rows = await request.json()
-#
-#     results = search_engine.find_similar_from_text_batch(rows)
-#     return {"results": results}
+@app.post("/search_batch")
+async def search_batch(request: Request, file: UploadFile | None = File(None)):
+    if search_engine.index_is_empty():
+        return {"detail": "Index is empty. Upload data first."}
+    if file:
+        raw = await file.read()
+        rows = parse_json_or_jsonl(raw)
+    else:
+        rows = await request.json()
+
+    queries = preprocess_query123(rows)
+
+    # similarity search by the multiple queries
+    id_score_lists = search_engine.similarity_search_batch(queries, k=10)
+    # returns [{"ids": ids, "scores": scores}, ... ]
+
+    # filter ids and scores if num rel chunks < k
+    ids = []
+    scores = []
+    for entry in id_score_lists:
+        filtered_ids = [_id for _id in entry["ids"] if _id != -1]
+        filtered_scores = [entry["scores"][i] for i in range(len(filtered_ids))]
+        ids.append(filtered_ids)
+        scores.append(filtered_scores)
+
+    print(ids)
+    print(scores)
+
+    chunks = search_engine.get_chunks_by_ids(ids)
+
+    return {"chunks": chunks}
 
 
 

@@ -31,6 +31,11 @@ def process_data(data):
         chunks.extend(process_single_dict(row))
     return chunks
 
+def preprocess_query_simple(rows):
+    return [rows[i]["query"] for i in range(len(rows))]
+
+def preprocess_query123(query):
+    return query[0]["categories"][0]["questions"]
 
 def main():
     chunks = process_data([{"transcript": "Today we discussed the new marketing strategy for Q1. The team agreed to focus on short-form video content and improve customer acquisition funnels.", "summary": "Meeting about Q1 marketing strategy and next steps.", "date": "2025-01-17", "attendants": ["Alice Johnson", "Mark Rivera", "Diana Petrova", "Samuel Kim"], "links": ["https://docs.example.com/marketing-plan", "https://drive.example.com/file/strategy-overview"]}])
@@ -38,4 +43,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    pass
