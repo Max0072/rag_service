@@ -1,6 +1,5 @@
 # Python
 datasets
-test_data_for_api
 __pycache__/
 *.py[cod]
 *$py.class

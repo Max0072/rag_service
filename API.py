@@ -90,15 +90,12 @@ async def search_batch(request: Request, file: UploadFile | None = File(None)):
         filtered_scores = [entry["scores"][i] for i in range(len(filtered_ids))]
         ids.append(filtered_ids)
         scores.append(filtered_scores)
-
     print(ids)
     print(scores)
 
     chunks = search_engine.get_chunks_by_ids(ids)
 
     return {"chunks": chunks}
-
-
 
 
 
